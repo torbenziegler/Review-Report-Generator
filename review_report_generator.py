@@ -63,6 +63,6 @@ def create_pdf(reviews, filename='Review_Report.pdf'):
     doc.build(elements)
 
 if __name__ == "__main__":
-    URL = 'https://apps.apple.com/de/app/selfapy-mental-health-app/id1565142590?see-all=reviews'
+    URL = 'https://apps.apple.com/de/app/selfapy-mental-health-app/id1565142590?see-all=reviews' # sample URL
     reviews = fetch_reviews(URL)
     create_pdf(reviews)
