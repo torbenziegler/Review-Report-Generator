@@ -4,19 +4,17 @@ from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.pdfgen import canvas
 from reportlab.lib import colors
 
+from pdf.utils.image_utils import download_image
+
 class MyCanvas(canvas.Canvas):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
     def draw_background(self):
-        # Draw a background color
         self.setFillColor(colors.lightgrey)
         self.rect(0, 0, letter[0], letter[1], fill=True)
 
-        # Optional: Draw an image as a background
-        # self.drawImage('background_image.png', 0, 0, width=letter[0], height=letter[1])
-
-def create_pdf(playstore_reviews, filename='Review_Report.pdf'):
+def create_pdf(data, filename='Review_Report.pdf'):
     doc = SimpleDocTemplate(filename, pagesize=letter)
     styles = getSampleStyleSheet()
     elements = []
@@ -34,7 +32,19 @@ def create_pdf(playstore_reviews, filename='Review_Report.pdf'):
     elements.append(title)
     elements.append(Spacer(1, 12))
 
-    # TODO: Crawl metadata from the app store pages
+    create_pdf_metadata_section(elements, data, styles)
+
+    if data:
+        print("Creating Play Store Reviews section...")
+        print(f"Total reviews: {len(data['comments'])}")
+        elements.append(Paragraph("Play Store Reviews", styles['Heading1']))
+        for review in data['comments']:
+            print(f"Creating review: {review}")
+            create_review(review, elements, styles)
+
+    doc.build(elements)
+
+def create_pdf_metadata_section(elements, playstore_reviews, styles):
     metadata = {
         "App Name": playstore_reviews['title'],
         "Description": playstore_reviews['description'],
@@ -54,28 +64,24 @@ def create_pdf(playstore_reviews, filename='Review_Report.pdf'):
         "updated": playstore_reviews['updated'],
     }
 
-    create_pdf_metadata_section(elements, metadata, styles)
-
-    if playstore_reviews:
-        elements.append(Paragraph("Play Store Reviews", styles['Heading1']))
-        for review in playstore_reviews['comments']:
-            create_review(review, elements, styles)
-
-    doc.build(elements)
-
-def create_pdf_metadata_section(elements, metadata, styles):
     elements.append(Paragraph("Metadata", styles['Heading1']))
     for key, value in metadata.items():
-        elements.append(Paragraph(f"{key}: {value}", styles['Normal']))
+        if key in ['icon', 'headerImage', 'screenshots']:
+            if isinstance(value, list):  # For screenshots
+                for image_url in value:
+                    img = download_image(image_url)
+                    if img:
+                        elements.append(img)
+            else:  # For single image URLs (Icon, Header Image)
+                img = download_image(value)
+                if img:
+                    elements.append(img)
+        else:
+            elements.append(Paragraph(f"{key}: {value}", styles['Normal']))
     elements.append(Spacer(1, 12))
 
 def create_review(review, elements, styles):
-    review_title = Paragraph(f"Title: {review.get('title', 'No title')}", styles['Heading2'])
-    review_rating = Paragraph(f"Rating: {review.get('rating', 'No rating')}", styles['Normal'])
-    review_text = Paragraph(f"\"{review.get('text', 'No text')}\"", styles['Normal'])
+    comment = Paragraph(review, styles['Normal'])
 
-    elements.append(review_title)
-    elements.append(review_rating)
-    elements.append(review_text)
+    elements.append(comment)
     elements.append(Spacer(1, 12))
-
