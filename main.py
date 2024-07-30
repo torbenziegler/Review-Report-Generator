@@ -1,4 +1,3 @@
-# from app_store_scraper import fetch_apple_reviews, fetch_playstore_reviews
 from pdf.pdf_generator import create_pdf
 from data.play_store_scraper import fetch_playstore_data
 

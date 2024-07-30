@@ -5,14 +5,13 @@ from reportlab.platypus import Image as RLImage
 
 def download_image(url):
     try:
-        response = requests.get(url)
+        response = requests.get(url, timeout=10)
         response.raise_for_status()
         print(f"Downloading image: {url}")
         image = Image.open(BytesIO(response.content))
         img_buffer = BytesIO()
         image.save(img_buffer, format='PNG')
         img_buffer.seek(0)
-        print(f"Downloaded image: {url}")
         return RLImage(img_buffer)
     except requests.exceptions.RequestException as e:
         print(f"Error downloading image: {e}")

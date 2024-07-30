@@ -28,44 +28,50 @@ def create_pdf(data, filename='Review_Report.pdf'):
     doc = SimpleDocTemplate(filename, pagesize=letter)
     doc.build(elements, onFirstPage=lambda canvas, doc: MyCanvas(filename, pagesize=letter).draw_background())
 
-    title = Paragraph("Review Report", styles['Title'])
-    elements.append(title)
-    elements.append(Spacer(1, 12))
-
+    create_pdf_title(elements, "Review Report", styles)
     create_pdf_metadata_section(elements, data, styles)
-
-    if data:
-        print("Creating Play Store Reviews section...")
-        print(f"Total reviews: {len(data['comments'])}")
-        elements.append(Paragraph("Play Store Reviews", styles['Heading1']))
-        for review in data['comments']:
-            print(f"Creating review: {review}")
-            create_review(review, elements, styles)
+    create_pdf_image_section(elements, data)
+    create_pdf_review_section(elements, data, styles)
 
     doc.build(elements)
 
-def create_pdf_metadata_section(elements, playstore_reviews, styles):
+
+def create_pdf_title(elements, title, styles):
+    title = Paragraph(title, styles['Title'])
+    elements.append(title)
+    elements.append(Spacer(1, 12))
+
+def create_pdf_metadata_section(elements, data, styles):
     metadata = {
-        "App Name": playstore_reviews['title'],
-        "Description": playstore_reviews['description'],
-        "Installs": playstore_reviews['installs'],
-        "Real installs": playstore_reviews['realInstalls'],
-        "free": playstore_reviews['free'],
-        "inAppProductPrice": playstore_reviews['inAppProductPrice'],
-        "developer": playstore_reviews['developer'],
-        "developerEmail": playstore_reviews['developerEmail'], 
-        "developerAddress": playstore_reviews['developerAddress'],
-        "genre": playstore_reviews['genre'],
-        "icon": playstore_reviews['icon'],
-        "headerImage": playstore_reviews['headerImage'],
-        "screenshots": playstore_reviews['screenshots'],
-        "containsAds": playstore_reviews['containsAds'],
-        "released": playstore_reviews['released'],
-        "updated": playstore_reviews['updated'],
+        "App Name": data['title'],
+        "Description": data['description'],
+        "Installs": data['installs'],
+        "Real installs": data['realInstalls'],
+        "free": data['free'],
+        "inAppProductPrice": data['inAppProductPrice'],
+        "developer": data['developer'],
+        "developerEmail": data['developerEmail'], 
+        "developerAddress": data['developerAddress'],
+        "genre": data['genre'],
+        "containsAds": data['containsAds'],
+        "released": data['released'],
+        "updated": data['updated'],
     }
 
     elements.append(Paragraph("Metadata", styles['Heading1']))
     for key, value in metadata.items():
+        elements.append(Paragraph(f"{key}: {value}", styles['Normal']))
+
+    
+
+def create_pdf_image_section(elements, data):
+    images = {
+        "icon": data['icon'],
+        "headerImage": data['headerImage'],
+        "screenshots": data['screenshots'],
+    }
+
+    for key, value in images.items():
         if key in ['icon', 'headerImage', 'screenshots']:
             if isinstance(value, list):  # For screenshots
                 for image_url in value:
@@ -76,8 +82,6 @@ def create_pdf_metadata_section(elements, playstore_reviews, styles):
                 img = download_image(value)
                 if img:
                     elements.append(img)
-        else:
-            elements.append(Paragraph(f"{key}: {value}", styles['Normal']))
     elements.append(Spacer(1, 12))
 
 def create_review(review, elements, styles):
@@ -85,3 +89,9 @@ def create_review(review, elements, styles):
 
     elements.append(comment)
     elements.append(Spacer(1, 12))
+
+def create_pdf_review_section(elements, data, styles):
+    elements.append(Paragraph("Play Store Reviews", styles['Heading1']))
+    for review in data['comments']:
+        print(f"Creating review: {review}")
+        create_review(review, elements, styles)
