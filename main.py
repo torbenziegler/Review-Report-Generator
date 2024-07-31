@@ -1,9 +1,10 @@
 from pdf.pdf_generator import create_pdf
-from data.play_store_scraper import fetch_playstore_data
+from data.play_store_scraper import fetch_playstore_data, fetch_playstore_reviews
 
 if __name__ == "__main__":
-    playstore_url = 'https://play.google.com/store/apps/details?id=com.selfapy.app'  # sample URL
-    google_reviews = fetch_playstore_data('com.nianticlabs.pokemongo')
+    app_package_name = 'com.nianticlabs.pokemongo'  # sample package name
+    play_metadata = fetch_playstore_data(app_package_name)
+    play_reviews = fetch_playstore_reviews(app_package_name)
 
-    create_pdf(google_reviews)
+    create_pdf(play_metadata, play_reviews)
     print("PDF report created successfully!")
