@@ -7,6 +7,9 @@ from reportlab.graphics.shapes import Drawing
 from reportlab.graphics.charts.piecharts import Pie
 from reportlab.graphics import renderPDF
 from datetime import datetime
+from pdf.utils.image_utils import download_image
+from reportlab.lib.units import inch
+from chatgpt.summarize import gpt_wrapper as summarize_text
 
 class MyCanvas(canvas.Canvas):
     def __init__(self, *args, **kwargs):
@@ -42,7 +45,7 @@ def create_pdf_title(elements, title, styles):
     elements.append(title)
     elements.append(Spacer(1, 12))
 
-def create_pdf_metadata_section(elements, data, styles):
+def create_key_facts_section(elements, data, styles):
     metadata = [
         ("Key Facts", ""),
         ("App Name", data['title']),
@@ -60,8 +63,8 @@ def create_pdf_metadata_section(elements, data, styles):
         ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
         ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
         ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),  # Keys in bold
-        ('FONTSIZE', (0, 0), (-1, 0), 14),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 12),
+        ('FONTSIZE', (0, 0), (-1, 0), 12),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
         ('LEFTPADDING', (0, 0), (-1, -1), 6),
         ('RIGHTPADDING', (0, 0), (-1, -1), 6),
         ('TOPPADDING', (0, 0), (-1, -1), 6),
@@ -72,8 +75,9 @@ def create_pdf_metadata_section(elements, data, styles):
 def create_layout(elements, data, styles):
     # Second section with two columns (left and right)
     left_top = Paragraph("Description Section", styles['Normal'])
+    left_top = create_description_section(elements, data, styles)
     left_bottom = Paragraph("Performance Chart Section", styles['Normal'])
-    right_section = create_pdf_metadata_section(elements, data, styles)
+    right_section = create_key_facts_section(elements, data, styles)
     
     table2 = Table([
         [left_top, right_section],
@@ -88,7 +92,8 @@ def create_layout(elements, data, styles):
         ('RIGHTPADDING', (0, 0), (-1, -1), 6),
         ('TOPPADDING', (0, 0), (-1, -1), 6),
         ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
-        ('GRID', (0, 0), (-1, -1), 10, colors.white)
+        ('GRID', (0, 0), (-1, -1), 10, colors.white),
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
     ]))
     elements.append(table2)
     elements.append(Spacer(1, 12))
@@ -114,8 +119,8 @@ def create_layout(elements, data, styles):
 
     # Fourth section with three columns (left, middle, right)
     left_section4 = Paragraph("Sectors", styles['Normal'])
-    # pull from data 'categories'
-    middle_section4 = Paragraph("Genres Chart", styles['Normal'])
+    middle_section4 = create_genre_section(elements, data, styles)
+    # middle_section4 = Paragraph("Genres Chart", styles['Normal'])
     right_section4 = Paragraph("Some other chart 4", styles['Normal'])
     
     table4 = Table([
@@ -144,29 +149,52 @@ def create_review(review, elements, styles):
     elements.append(comment)
     elements.append(Spacer(1, 12))
 
-def create_pie_chart(data, title="Pie Chart"):
-    # Create a Drawing object
-    drawing = Drawing(300, 200)
-    
-    # Create a Pie chart instance
-    pie = Pie()
-    
-    # Set pie chart data
-    pie.data = [data[key] for key in data]
-    pie.labels = list(data.keys())
-    
-    # Set the position and size of the pie chart
-    pie.x = 50
-    pie.y = 50
-    pie.width = 200
-    pie.height = 150
-    
-    # Set colors for slices (optional)
-    pie.slices.strokeColor = colors.black
-    pie.slices.fillColor = [colors.red, colors.green, colors.blue, colors.yellow]
 
-    # Add the pie chart to the drawing
-    drawing.add(pie)
+def create_description_section(elements, data, styles):
+    # Download the image
+    img = download_image(data['icon'], (100, 100))
 
-    # Return the Drawing object
-    return drawing
+    description = Paragraph(summarize_text(data['description']), styles['Normal'])
+    table_data = [[img, description]]
+    
+    # Create the table
+    table = Table(table_data, colWidths=[1.5 * inch, 2.5 * inch])  # Adjust column widths as needed
+    
+    # Apply styles to the table
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, -1), colors.lightgrey),
+        ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('FONTNAME', (1, 0), (1, 0), 'Helvetica-Bold'),  # Only text in bold
+        ('FONTSIZE', (0, 0), (-1, -1), 12),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+        ('LEFTPADDING', (0, 0), (-1, -1), 6),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 6),
+        ('TOPPADDING', (0, 0), (-1, -1), 2),
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+    ]))
+    
+    return table
+
+def create_genre_section(elements, data, styles):
+    metadata = [
+        ("Genres", "")
+    ]
+    metadata.extend([(genre['name'], "") for genre in data['categories']])
+
+    # keep max 5 genres
+    metadata = metadata[:5]
+    table = Table(metadata, colWidths=[80, 80])
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, -1), colors.lightgrey),
+        ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),  # Keys in bold
+        ('FONTSIZE', (0, 0), (-1, 0), 12),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 2),
+        ('LEFTPADDING', (0, 0), (-1, -1), 6),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 6),
+        ('TOPPADDING', (0, 0), (-1, -1), 6),
+    ]))
+    
+    return table
