@@ -9,7 +9,7 @@ from reportlab.graphics import renderPDF
 from datetime import datetime
 from pdf.utils.image_utils import download_image
 from reportlab.lib.units import inch
-from chatgpt.summarize import gpt_wrapper as summarize_text
+from data.chatgpt.summarize import gpt_wrapper as summarize_text
 
 class MyCanvas(canvas.Canvas):
     def __init__(self, *args, **kwargs):
