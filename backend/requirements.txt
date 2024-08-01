@@ -3,3 +3,4 @@ pillow
 reportlab
 google-play-scraper
 openai
+Flask
