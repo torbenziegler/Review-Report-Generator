@@ -3,7 +3,7 @@ from flask import Flask, make_response, send_file
 from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app, origins='http://localhost:5173')
+CORS(app)
 
 PDF_DIR = os.path.join(os.getcwd())
 # PDF_DIR = os.path.join(os.getcwd(), "backend", "output")
