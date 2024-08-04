@@ -1,7 +1,7 @@
 from reportlab.platypus import Table, TableStyle
 from reportlab.lib import colors
 
-def create_genre_section(elements, data, styles):
+def create_genre_section(elements, data, styles, background_color=colors.lightgrey):
     category_label = "Genres" if len(data['categories']) > 1 else "Genre"
     metadata = [
         (category_label, "")
@@ -12,7 +12,7 @@ def create_genre_section(elements, data, styles):
     metadata = metadata[:5]
     table = Table(metadata, colWidths=[80, 80])
     table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, -1), colors.lightgrey),
+        ('BACKGROUND', (0, 0), (-1, -1), background_color),
         ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
         ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
         ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),  # Keys in bold

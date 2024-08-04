@@ -4,7 +4,7 @@ from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib import colors
 from pdf.utils.date_utils import format_date
 
-def create_key_facts_section(data):
+def create_key_facts_section(data, background_color=colors.lightgrey):
     app_name = f'<a href="{data["url"]}" color="blue">{data["title"]}</a>'
     app_name_paragraph = Paragraph(app_name, ParagraphStyle(name='Normal', textColor=colors.blue))
     metadata = [
@@ -21,7 +21,7 @@ def create_key_facts_section(data):
 
     table = Table(metadata, colWidths=[80, 400])
     table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, -1), colors.lightgrey),
+        ('BACKGROUND', (0, 0), (-1, -1), background_color),
         ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
         ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
         ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),  # Keys in bold

@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-IS_DEBUG = bool(os.getenv("DEBUG"))
+IS_DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 API_KEY = os.getenv("OPENAI_API_KEY")
 client = OpenAI(api_key=API_KEY)
 

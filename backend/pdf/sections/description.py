@@ -7,7 +7,7 @@ from pdf.utils.image_utils import download_image
 from pdf.utils.date_utils import format_date
 
 
-def create_description_section(data, styles):
+def create_description_section(data, styles, background_color=colors.lightgrey):
     img = download_image(data['icon'], (100, 100))
 
     description_text = f"{data['title']} is a {data['free'] is True and 'free' or 'paid'} app and was developed by {data['developer']} at {data['developerAddress']}."
@@ -21,7 +21,7 @@ def create_description_section(data, styles):
     
     # Apply styles to the table
     table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, -1), colors.lightgrey),
+        ('BACKGROUND', (0, 0), (-1, -1), background_color),
         ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
         ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
         ('FONTNAME', (1, 0), (1, 0), 'Helvetica-Bold'),  # Only text in bold
