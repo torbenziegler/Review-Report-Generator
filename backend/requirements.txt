@@ -5,3 +5,4 @@ google-play-scraper
 openai
 Flask
 flask-cors
+matplotlib

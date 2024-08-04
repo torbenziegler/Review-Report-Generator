@@ -1,12 +1,13 @@
 from datetime import datetime
 from reportlab.lib.pagesizes import letter
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle 
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle , ListFlowable, ListItem, Image
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.pdfgen import canvas
 from reportlab.lib import colors
 from reportlab.lib.units import inch
 from pdf.utils.image_utils import download_image
-from data.chatgpt.summarize import gpt_wrapper as summarize_text
+from pdf.utils.graph_utils import create_histogram_image
+import matplotlib.pyplot as plt
 
 class MyCanvas(canvas.Canvas):
     def __init__(self, *args, **kwargs):
@@ -21,20 +22,16 @@ def create_pdf(data, reviews, filename='Review_Report.pdf'):
     styles = getSampleStyleSheet()
     elements = []
 
-    # Create a custom canvas and draw the background
     canvas = MyCanvas(filename, pagesize=letter)
     canvas.draw_background()
     canvas.save()
 
-    # Create a document with the custom canvas
     doc = SimpleDocTemplate(filename, pagesize=letter)
     doc.build(elements, onFirstPage=add_page_decorations)
 
     create_pdf_title(elements, data['title'], styles)
-    create_layout(elements, data, styles)
+    create_layout(elements, data, reviews, styles)
     
-    # create_pdf_review_section(elements, reviews, styles)
-
     doc.build(elements)
 
 def add_page_decorations(canvas, doc):
@@ -79,11 +76,12 @@ def create_key_facts_section(elements, data, styles):
     
     return table
 
-def create_layout(elements, data, styles):
+def create_layout(elements, data, reviews, styles):
     # Second section with two columns (left and right)
     left_top = Paragraph("Description Section", styles['Normal'])
     left_top = create_description_section(elements, data, styles)
-    left_bottom = Paragraph("Performance Chart Section", styles['Normal'])
+
+    left_bottom = create_performance_section(data)
     right_section = create_key_facts_section(elements, data, styles)
     
     table2 = Table([
@@ -147,6 +145,12 @@ def create_layout(elements, data, styles):
     elements.append(table4)
     elements.append(Spacer(1, 12))
 
+def create_performance_section(data, img_size=(290, 180)):
+    width, height = img_size
+    histogram_image = create_histogram_image(data['histogram'], "Performance Histogram", "tbd x", "tbd y")
+    performance_chart = Image(histogram_image, width, height)
+    return performance_chart
+
 def create_pdf_review_section(elements, reviews, styles):
     elements.append(Paragraph("Play Store Reviews", styles['Heading1']))
     for review in reviews:
@@ -162,7 +166,6 @@ def create_description_section(elements, data, styles):
     # Download the image
     img = download_image(data['icon'], (100, 100))
 
-    # description = Paragraph(summarize_text(data['description']), styles['Normal'])
     description_text = f"{data['title']} is a {data['free'] is True and 'free' or 'paid'} app and was developed by {data['developer']} at {data['developerAddress']}."
     description_details = f"Released on {data['released']} and last updated on {datetime.fromtimestamp(data['updated']).strftime('%b %d, %Y')}."
     full_description = f"{description_text} {description_details}"
@@ -188,8 +191,35 @@ def create_description_section(elements, data, styles):
     
     return table
 
+
 def create_review_feedback_section(elements, data, styles):
-    return Paragraph("Left Section 3", styles['Normal']), Paragraph("Right Section", styles['Normal'])
+    # Sample text for the bullet point lists
+    left_text = [
+        "Feedback point one for the left section.",
+        "Feedback point two for the left section.",
+        "Feedback point three for the left section."
+    ]
+    
+    right_text = [
+        "Feedback point one for the right section.",
+        "Feedback point two for the right section.",
+        "Feedback point three for the right section."
+    ]
+    
+    # Create a list flowable for the left section
+    left_bullets = ListFlowable(
+        [ListItem(Paragraph(text, styles['Normal']), bulletText='•') for text in left_text],
+        bulletType='bullet'
+    )
+    
+    # Create a list flowable for the right section
+    right_bullets = ListFlowable(
+        [ListItem(Paragraph(text, styles['Normal']), bulletText='•') for text in right_text],
+        bulletType='bullet'
+    )
+    
+    return left_bullets, right_bullets
+
 
 def create_genre_section(elements, data, styles):
     category_label = "Genres" if len(data['categories']) > 1 else "Genre"
