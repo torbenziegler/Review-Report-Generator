@@ -1,14 +1,11 @@
+from datetime import datetime
 from reportlab.lib.pagesizes import letter
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
-from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle 
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.pdfgen import canvas
 from reportlab.lib import colors
-from reportlab.graphics.shapes import Drawing
-from reportlab.graphics.charts.piecharts import Pie
-from reportlab.graphics import renderPDF
-from datetime import datetime
-from pdf.utils.image_utils import download_image
 from reportlab.lib.units import inch
+from pdf.utils.image_utils import download_image
 from data.chatgpt.summarize import gpt_wrapper as summarize_text
 
 class MyCanvas(canvas.Canvas):
@@ -31,30 +28,40 @@ def create_pdf(data, reviews, filename='Review_Report.pdf'):
 
     # Create a document with the custom canvas
     doc = SimpleDocTemplate(filename, pagesize=letter)
-    doc.build(elements, onFirstPage=lambda canvas, doc: MyCanvas(filename, pagesize=letter).draw_background())
+    doc.build(elements, onFirstPage=add_page_decorations)
 
-    create_pdf_title(elements, "Review Report", styles)
+    create_pdf_title(elements, data['title'], styles)
     create_layout(elements, data, styles)
     
     # create_pdf_review_section(elements, reviews, styles)
 
     doc.build(elements)
 
+def add_page_decorations(canvas, doc):
+    # Draw the background
+    MyCanvas(canvas.getpdfdata(), pagesize=letter).draw_background()
+    # Draw the footer
+    create_footer(canvas, doc)
+
 def create_pdf_title(elements, title, styles):
-    title = Paragraph(title, styles['Title'])
+    title_text = f"{title} Review Report"
+    title = Paragraph(title_text, styles['Title'])
     elements.append(title)
     elements.append(Spacer(1, 12))
 
 def create_key_facts_section(elements, data, styles):
+    app_name = f'<a href="{data["url"]}" color="blue">{data["title"]}</a>'
+    app_name_paragraph = Paragraph(app_name, ParagraphStyle(name='Normal', textColor=colors.blue))
     metadata = [
         ("Key Facts", ""),
-        ("App Name", data['title']),
+        ("App Name", app_name_paragraph),
         ("Rating", str(round(data['score'], 2))),
         ("Installs", data['installs']),
-        ("In-app Prices", data['inAppProductPrice']),
+        ("In-app Prices", data['inAppProductPrice'] or "None"),
+        ("Contains Ads", data['containsAds']),
         ("Developer", data['developer']),
         ("Released", data['released']),
-        ("Last Updated", datetime.fromtimestamp(data['updated']).strftime('%Y-%m-%d')),
+        ("Last Updated", datetime.fromtimestamp(data['updated']).strftime('%b %d, %Y')),
     ]
 
     table = Table(metadata, colWidths=[80, 400])
@@ -99,8 +106,9 @@ def create_layout(elements, data, styles):
     elements.append(Spacer(1, 12))
 
     # Third section with two columns (left and right)
-    left_section3 = Paragraph("Left Section 3", styles['Normal'])
-    right_section3 = Paragraph("Right Section 3", styles['Normal'])
+    left_section3, right_section3 = create_review_feedback_section(elements, data, styles)
+    #left_section3 = Paragraph("Left Section 3", styles['Normal'])
+    # right_section3 = Paragraph("Right Section 3", styles['Normal'])
     
     table3 = Table([
         [left_section3, right_section3]
@@ -118,8 +126,8 @@ def create_layout(elements, data, styles):
     elements.append(Spacer(1, 12))
 
     # Fourth section with three columns (left, middle, right)
-    left_section4 = Paragraph("Sectors", styles['Normal'])
-    middle_section4 = create_genre_section(elements, data, styles)
+    left_section4 = create_genre_section(elements, data, styles)
+    middle_section4 = Paragraph("Sectors", styles['Normal'])
     # middle_section4 = Paragraph("Genres Chart", styles['Normal'])
     right_section4 = Paragraph("Some other chart 4", styles['Normal'])
     
@@ -154,7 +162,11 @@ def create_description_section(elements, data, styles):
     # Download the image
     img = download_image(data['icon'], (100, 100))
 
-    description = Paragraph(summarize_text(data['description']), styles['Normal'])
+    # description = Paragraph(summarize_text(data['description']), styles['Normal'])
+    description_text = f"{data['title']} is a {data['free'] is True and 'free' or 'paid'} app and was developed by {data['developer']} at {data['developerAddress']}."
+    description_details = f"Released on {data['released']} and last updated on {datetime.fromtimestamp(data['updated']).strftime('%b %d, %Y')}."
+    full_description = f"{description_text} {description_details}"
+    description = Paragraph(full_description, styles['Normal'])
     table_data = [[img, description]]
     
     # Create the table
@@ -176,9 +188,13 @@ def create_description_section(elements, data, styles):
     
     return table
 
+def create_review_feedback_section(elements, data, styles):
+    return Paragraph("Left Section 3", styles['Normal']), Paragraph("Right Section", styles['Normal'])
+
 def create_genre_section(elements, data, styles):
+    category_label = "Genres" if len(data['categories']) > 1 else "Genre"
     metadata = [
-        ("Genres", "")
+        (category_label, "")
     ]
     metadata.extend([(genre['name'], "") for genre in data['categories']])
 
@@ -198,3 +214,29 @@ def create_genre_section(elements, data, styles):
     ]))
     
     return table
+
+
+def create_footer(canvas, doc):
+    footer_text = 'This report was created by '
+    footer_hyperlink = 'Review Report Generator'
+    footer_url = 'https://github.com/torbenziegler/Review-Report-Scraper'
+    
+    # Set the footer text and add a hyperlink
+    canvas.saveState()
+    canvas.setFont('Helvetica', 9)
+    
+    # Position the footer at the bottom of the page
+    text_width = canvas.stringWidth(footer_text, 'Helvetica', 9)
+    hyperlink_width = canvas.stringWidth(footer_hyperlink, 'Helvetica-Bold', 9)
+    
+    x = (doc.pagesize[0] - text_width - hyperlink_width) / 2
+    y = 0.5 * inch
+    
+    canvas.drawString(x, y, footer_text)
+    x += text_width
+    canvas.setFont('Helvetica-Bold', 9)
+    canvas.drawString(x, y, footer_hyperlink)
+    
+    # Add the hyperlink annotation
+    canvas.linkURL(footer_url, (x, y - 2, x + hyperlink_width, y + 10), relative=1)
+    canvas.restoreState()

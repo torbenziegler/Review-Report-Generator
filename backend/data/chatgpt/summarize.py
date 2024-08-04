@@ -13,6 +13,7 @@ Artificial intelligence (AI) refers to the simulation of human intelligence in m
 """
 
 def summarize_text(text, model="gpt-3.5-turbo"):
+    print("Running GPT-3.5 model to summarize text...")
     response = client.chat.completions.create(
         model=model,
         messages=[
@@ -31,8 +32,6 @@ def get_sample_text():
     return SAMPLE_TEXT
 
 def gpt_wrapper(text):
-    print("Running GPT-3.5 model to summarize text...")
-    print("Input text:", text)
     if IS_DEBUG is None:
         print("DEBUG environment variable not found. Please set the DEBUG environment variable.")
         return SAMPLE_TEXT
