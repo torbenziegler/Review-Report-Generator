@@ -7,10 +7,15 @@ from pdf.utils.date_utils import format_date
 def create_key_facts_section(data, background_color=colors.lightgrey):
     app_name = f'<a href="{data["url"]}" color="blue">{data["title"]}</a>'
     app_name_paragraph = Paragraph(app_name, ParagraphStyle(name='Normal', textColor=colors.blue))
+    score = data['score']
+    if score is None:
+        rating = "No Ratings"
+    else:
+        rating = str(round(score, 2))
     metadata = [
         ("Key Facts", ""),
         ("App Name", app_name_paragraph),
-        ("Rating", str(round(data['score'], 2))),
+        ("Rating", rating),
         ("Installs", data['installs']),
         ("In-app Prices", data['inAppProductPrice'] or "None"),
         ("Contains Ads", data['containsAds']),
