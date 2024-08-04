@@ -23,7 +23,7 @@ def return_pdf(filename):
             response = make_response(send_file(file_path))
             response.headers['Content-Type'] = 'application/pdf'
             response.headers['Content-Disposition'] = \
-            'inline; filename=%s.pdf' % 'yourfilename'
+            'inline; filename=%s.pdf' % filename
             return response
         else:
             return make_response(f"File '{filename}' not found.", 404)
