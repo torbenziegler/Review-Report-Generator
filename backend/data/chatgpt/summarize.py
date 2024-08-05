@@ -9,40 +9,53 @@ API_KEY = os.getenv("OPENAI_API_KEY")
 client = OpenAI(api_key=API_KEY)
 
 SAMPLE_TEXT = """
-Artificial intelligence (AI) refers to the simulation of human intelligence in machines that are programmed to think like humans and mimic their actions. The term may also be applied to any machine that exhibits traits associated with a human mind such as learning and problem-solving. The ideal characteristic of artificial intelligence is its ability to rationalize and take actions that have the best chance of achieving a specific goal. A subset of artificial intelligence is machine learning, which refers to the concept that computer programs can automatically learn from and adapt to new data without being assisted by humans. Deep learning techniques enable this automatic learning through the absorption of huge amounts of unstructured data such as text, images, or video.
+- Users generally express high satisfaction with the app, often giving it a 5-star rating.
+- Comments indicate that users find the app excellent for navigation and trip planning.
+- Many users appreciate features like offline maps and the ability to plan trips on a laptop.
+- Users describe the app as "the best," "fantastic," and "awesome."
+- There are expressions of gratitude towards the app for its usefulness in finding locations and navigating.
+- Some users mention it as a go-to tool for discovering new places.
+- A few reviews highlight concerns about the future of the app, particularly regarding changes to Google Maps for browsers.
+- Overall, the app is perceived positively with users enjoying its functionality and ease of use.
 """
 
-def summarize_text(text, model="gpt-3.5-turbo"):
-    print("Running GPT-3.5 model to summarize text...")
-    response = client.chat.completions.create(
+def gpt_decorator(func):
+    def wrapper(*args, **kwargs):
+        if IS_DEBUG is None:
+            print("DEBUG environment variable not found. Please set the DEBUG environment variable.")
+            return SAMPLE_TEXT
+        elif IS_DEBUG:
+            print("Debug mode enabled. Retrieve sample text")
+            return SAMPLE_TEXT
+        elif API_KEY is None:
+            print("OpenAI API Key not found. Please set the OPENAI_API_KEY environment variable.")
+            return SAMPLE_TEXT
+        else:
+            result = func(*args, **kwargs)
+            summary = summarize(result)
+            print("Summary:", summary)
+            return summary
+    return wrapper
+
+def summarize(text, model="gpt-4o-mini"):
+    print(f"Running {model} to summarize text...")
+    completion = client.chat.completions.create(
         model=model,
         messages=[
             {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": f"Summarize the following text:\n\n{text}"}
+            {"role": "user", "content": f"The following are reviews of an app. Create a bullet point list on user perception on the app. Return straight the answer without any additional sentences: \n\n{text}"}
         ],
         max_tokens=150,  # Adjust the token count as needed
         n=1,
         stop=None,
         temperature=0.5,
     )
-    summary = response.choices[0].message['content'].strip()
+    summary = completion.choices[0].message
     return summary
+
+@gpt_decorator
+def summarize_text(text):
+    return text
 
 def get_sample_text():
     return SAMPLE_TEXT
-
-def gpt_wrapper(text):
-    if IS_DEBUG is None:
-        print("DEBUG environment variable not found. Please set the DEBUG environment variable.")
-        return SAMPLE_TEXT
-    elif IS_DEBUG:
-        print("Debug mode enabled. Retrieve sample text")
-        print("OpenAI API Key:", API_KEY)
-        return SAMPLE_TEXT
-    elif API_KEY is None:
-        print("OpenAI API Key not found. Please set the OPENAI_API_KEY environment variable.")
-        return SAMPLE_TEXT
-    else:
-        summary = summarize_text(text)
-        print("Summary:", summary)
-        return summary

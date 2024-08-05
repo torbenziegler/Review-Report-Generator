@@ -79,8 +79,8 @@ def create_layout(elements, data, reviews, styles):
     elements.append(Spacer(1, 12))
 
     # Third section with two columns (left and right)
-    left_section3, right_section3 = create_review_feedback_section(elements, data, styles)
-    
+    left_section3, right_section3 = create_review_feedback_section(elements, reviews, styles)
+
     table3 = Table([
         [left_section3, right_section3]
     ], colWidths=[letter[0]/2 - 6, letter[0]/2 - 6])
@@ -91,7 +91,8 @@ def create_layout(elements, data, reviews, styles):
         ('RIGHTPADDING', (0, 0), (-1, -1), 6),
         ('TOPPADDING', (0, 0), (-1, -1), 6),
         ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
-        ('GRID', (0, 0), (-1, -1), 10, colors.white)
+        ('GRID', (0, 0), (-1, -1), 10, colors.white),
+        ('VALIGN', (0, 0), (-1, -1), 'TOP')
     ]))
     elements.append(table3)
     elements.append(Spacer(1, 12))

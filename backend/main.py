@@ -1,4 +1,5 @@
 from pdf.pdf_generator import create_pdf
+from data.chatgpt.summarize import summarize_text
 from data.scraper.play_store_scraper import fetch_playstore_data, fetch_playstore_reviews
 
 def generate_report(app_package_name):
