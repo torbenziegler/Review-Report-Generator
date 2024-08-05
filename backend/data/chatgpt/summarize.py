@@ -50,7 +50,7 @@ def summarize(text, model="gpt-4o-mini"):
         stop=None,
         temperature=0.5,
     )
-    summary = completion.choices[0].message
+    summary = completion.choices[0].message.content
     return summary
 
 @gpt_decorator
