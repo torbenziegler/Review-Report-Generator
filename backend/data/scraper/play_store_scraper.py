@@ -16,6 +16,6 @@ def fetch_playstore_reviews(package_name, lang='en', count=5):
         country='us', # defaults to 'us'
         sort=Sort.NEWEST, # defaults to Sort.NEWEST
         count=100, # defaults to 100
-        filter_score_with=5 # defaults to None(means all score)
+        filter_score_with=None # defaults to None(means all score)
     )
     return result[0] 
