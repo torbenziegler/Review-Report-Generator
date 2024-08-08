@@ -6,19 +6,19 @@ This script helps you quickly understand customer opinions based on app reviews 
 
 ## Features
 
-- **Extracts Reviews**: Fetches reviews from specified app URLs.
-- **Generates PDF Reports**: Compiles reviews into a well-formatted PDF report.
+- **Extracts Reviews**: Fetches reviews for specified apps and creates a summary of latest impressions.
+- **Generates PDF Reports**: Compiles data into a well-formatted PDF factsheet report.
 
 ## Planned Features
 
-- [x] Crawl App Store reviews
-- [ ] Crawl Play Store reviews
+- [x] Crawl Play Store reviews
+- [ ] Crawl App Store reviews
 - [x] Export to PDF
-- [ ] Summary with ChatGPT in PDF
-- [ ] Summary of stars, etc. (basic metadata section)
+- [x] Summary with ChatGPT in PDF
+- [x] Summary of stars, etc. (basic metadata section)
 - [ ] Summary of app info (crawled from store info)
-- [ ] Flask API
-- [ ] Frontend (SveltKit + Flowbite)
+- [x] Flask API
+- [x] Frontend (SveltKit + Flowbite)
 
 ## Usage
 
@@ -37,3 +37,9 @@ pip install -r "requirements.txt"
 TBD
 
 The script will generate a PDF file named `Review_Report.pdf` (default, if not specified otherwise) containing the extracted data as fact sheet.
+
+### Frontend
+
+TBD
+
+Enter the app's package name and retrieve the report.
