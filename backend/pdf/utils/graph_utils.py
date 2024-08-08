@@ -1,5 +1,5 @@
-import matplotlib.pyplot as plt
 import io
+import matplotlib.pyplot as plt
 
 def create_histogram_image(data, title, x_label, y_label):
     plt.figure(figsize=(6, 4))

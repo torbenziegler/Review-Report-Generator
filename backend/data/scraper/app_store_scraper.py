@@ -32,8 +32,7 @@ def fetch_apple_reviews(url):
                 review['text'] = review_text_element.text.strip()
 
             reviews.append(review)
-        
         return reviews
-    else:
-        print(f"Failed to retrieve the webpage. Status code: {response.status_code}")
-        return []
+    print(f"Failed to retrieve the webpage. Status code: {response.status_code}")
+    return []
+    

@@ -22,19 +22,19 @@ SAMPLE_TEXT = """
 def gpt_decorator(func):
     def wrapper(*args, **kwargs):
         if IS_DEBUG is None:
-            print("DEBUG environment variable not found. Please set the DEBUG environment variable.")
+            print("Missing DEBUG environment variable. Please set the DEBUG environment variable.")
             return SAMPLE_TEXT
-        elif IS_DEBUG:
+        if IS_DEBUG:
             print("Debug mode enabled. Retrieve sample text")
             return SAMPLE_TEXT
-        elif API_KEY is None:
+        if API_KEY is None:
             print("OpenAI API Key not found. Please set the OPENAI_API_KEY environment variable.")
             return SAMPLE_TEXT
-        else:
-            result = func(*args, **kwargs)
-            summary = summarize(result)
-            print("Summary:", summary)
-            return summary
+        
+        result = func(*args, **kwargs)
+        summary = summarize(result)
+        print("Summary:", summary)
+        return summary
     return wrapper
 
 def summarize(text, model="gpt-4o-mini"):

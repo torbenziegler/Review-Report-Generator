@@ -43,9 +43,8 @@ def build_tbd_section(styles):
         [title],
         [bullets]
     ], colWidths=[letter[0]/2 - 6])
-
     return full_section
 
 
-def create_review_feedback_section(elements, reviews, styles):
+def create_review_feedback_section(reviews, styles):
     return build_user_feedback_section(reviews, styles), build_tbd_section(styles)

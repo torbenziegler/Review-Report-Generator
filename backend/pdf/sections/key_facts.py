@@ -36,5 +36,4 @@ def create_key_facts_section(data, background_color=colors.lightgrey):
         ('RIGHTPADDING', (0, 0), (-1, -1), 6),
         ('TOPPADDING', (0, 0), (-1, -1), 6),
     ]))
-    
     return table

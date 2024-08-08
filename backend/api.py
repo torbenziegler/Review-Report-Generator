@@ -2,7 +2,6 @@ import os
 from flask import Flask, make_response, send_file
 from flask_cors import CORS
 from main import generate_report
-import asyncio
 
 app = Flask(__name__)
 CORS(app)
@@ -27,8 +26,7 @@ def return_pdf(package_name):
             response.headers['Content-Disposition'] = \
             'inline; filename=%s.pdf' % file_name
             return response
-        else:
-            return make_response(f"File '{file_name}' not found.", 404)
+        return make_response(f"File '{file_name}' not found.", 404)
     except Exception as e:
         print(f"Error: {str(e)}")
         return make_response(f"Error: {str(e)}", 500)

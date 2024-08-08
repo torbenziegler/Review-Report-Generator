@@ -79,7 +79,7 @@ def create_layout(elements, data, reviews, styles):
     elements.append(Spacer(1, 12))
 
     # Third section with two columns (left and right)
-    left_section3, right_section3 = create_review_feedback_section(elements, reviews, styles)
+    left_section3, right_section3 = create_review_feedback_section(reviews, styles)
 
     table3 = Table([
         [left_section3, right_section3]
@@ -98,7 +98,7 @@ def create_layout(elements, data, reviews, styles):
     elements.append(Spacer(1, 12))
 
     # Fourth section with three columns (left, middle, right)
-    left_section4 = create_genre_section(elements, data, styles, background_color)
+    left_section4 = create_genre_section(data, background_color)
     middle_section4 = Paragraph("Sectors", styles['Normal'])
     # middle_section4 = Paragraph("Genres Chart", styles['Normal'])
     right_section4 = Paragraph("Some other chart 4", styles['Normal'])

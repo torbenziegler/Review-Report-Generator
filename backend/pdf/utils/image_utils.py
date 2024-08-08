@@ -9,7 +9,6 @@ def download_image(url, size=None):
         response.raise_for_status()
         print(f"Downloading image: {url}")
         image = Image.open(BytesIO(response.content))
-        
         if size is not None:
             print(f"Resizing image to: {size}")
             image = image.resize(size, Image.LANCZOS)

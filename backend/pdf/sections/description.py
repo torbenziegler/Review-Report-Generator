@@ -1,4 +1,3 @@
-from datetime import datetime
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import Paragraph, Table, TableStyle
 from reportlab.lib import colors

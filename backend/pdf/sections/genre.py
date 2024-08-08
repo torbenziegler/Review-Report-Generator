@@ -1,7 +1,7 @@
 from reportlab.platypus import Table, TableStyle
 from reportlab.lib import colors
 
-def create_genre_section(elements, data, styles, background_color=colors.lightgrey):
+def create_genre_section(data, background_color=colors.lightgrey):
     category_label = "Genres" if len(data['categories']) > 1 else "Genre"
     metadata = [
         (category_label, "")
@@ -22,5 +22,4 @@ def create_genre_section(elements, data, styles, background_color=colors.lightgr
         ('RIGHTPADDING', (0, 0), (-1, -1), 6),
         ('TOPPADDING', (0, 0), (-1, -1), 6),
     ]))
-    
     return table
