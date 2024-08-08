@@ -11,8 +11,8 @@ This script helps you quickly understand customer opinions based on app reviews 
 
 ## Planned Features
 
-- [] Crawl App Store reviews
 - [x] Crawl Play Store reviews
+- [ ] Crawl App Store reviews
 - [x] Export to PDF
 - [x] Summary with ChatGPT in PDF
 - [x] Summary of stars, etc. (basic metadata section)
