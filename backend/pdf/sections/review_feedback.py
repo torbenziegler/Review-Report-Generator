@@ -31,12 +31,12 @@ def build_tbd_section(styles):
         "Feedback point two for the right section.",
         "Feedback point three for the right section."
     ]
-    
+
     # Create a list flowable for the right section
     bullets = ListFlowable(
         [ListItem(Paragraph(text, styles['Normal']), bulletText='•') for text in sample_text],
         bulletType='bullet'
-    )   
+    )
 
     title = Paragraph("Section TBD", styles['Heading2'])
     full_section = Table([

@@ -30,7 +30,7 @@ def gpt_decorator(func):
         if API_KEY is None:
             print("OpenAI API Key not found. Please set the OPENAI_API_KEY environment variable.")
             return SAMPLE_TEXT
-        
+
         result = func(*args, **kwargs)
         summary = summarize(result)
         print("Summary:", summary)
@@ -38,6 +38,11 @@ def gpt_decorator(func):
     return wrapper
 
 def summarize(text, model="gpt-4o-mini"):
+    """
+    Process the text using the specified model to generate a summary.
+    @param text: The input text to summarize.
+    @param model: The model to use for summarization.
+    """
     print(f"Running {model} to summarize text...")
     completion = client.chat.completions.create(
         model=model,
@@ -55,7 +60,13 @@ def summarize(text, model="gpt-4o-mini"):
 
 @gpt_decorator
 def summarize_text(text):
+    """
+    Summarizes the input text
+    """
     return text
 
 def get_sample_text():
+    """
+    Returns a sample text for debugging purposes
+    """
     return SAMPLE_TEXT

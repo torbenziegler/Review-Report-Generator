@@ -23,10 +23,16 @@ class MyCanvas(canvas.Canvas):
         super().__init__(*args, **kwargs)
 
     def draw_background(self):
+        """
+        Draw a background color for the first page.
+        """
         self.setFillColor(colors.lightgrey)
         self.rect(0, 0, letter[0], letter[1], fill=True)
 
 def create_pdf(data, reviews, filename='Review_Report.pdf'):
+    """
+    Create a PDF report based on the data and reviews provided.
+    """
     doc = SimpleDocTemplate(filename, pagesize=letter)
     styles = getSampleStyleSheet()
     elements = []
@@ -40,10 +46,13 @@ def create_pdf(data, reviews, filename='Review_Report.pdf'):
 
     create_pdf_title(elements, data['title'], styles)
     create_layout(elements, data, reviews, styles)
-    
+
     doc.build(elements)
 
 def add_page_decorations(canvas, doc):
+    """
+    Add page decorations to the PDF.
+    """
     # Draw the background
     MyCanvas(canvas.getpdfdata(), pagesize=letter).draw_background()
     # Draw the footer
@@ -51,6 +60,9 @@ def add_page_decorations(canvas, doc):
 
 
 def create_layout(elements, data, reviews, styles):
+    """
+    Create the layout of the PDF report.
+    """
     background_color = colors.lightgrey if IS_DEBUG is True else colors.white
 
     # First section with two columns (left and right)
@@ -58,7 +70,7 @@ def create_layout(elements, data, reviews, styles):
 
     left_bottom = create_performance_section(data)
     right_section = create_key_facts_section(data, background_color)
-    
+
     table2 = Table([
         [left_top, right_section],
         [left_bottom, '']
@@ -102,7 +114,7 @@ def create_layout(elements, data, reviews, styles):
     middle_section4 = Paragraph("Sectors", styles['Normal'])
     # middle_section4 = Paragraph("Genres Chart", styles['Normal'])
     right_section4 = Paragraph("Some other chart 4", styles['Normal'])
-    
+
     table4 = Table([
         [left_section4, middle_section4, right_section4]
     ], colWidths=[letter[0]/3 - 6, letter[0]/3 - 6, letter[0]/3 - 6])

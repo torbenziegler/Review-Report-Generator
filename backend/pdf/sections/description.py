@@ -31,5 +31,5 @@ def create_description_section(data, styles, background_color=colors.lightgrey):
         ('TOPPADDING', (0, 0), (-1, -1), 2),
         ('VALIGN', (0, 0), (-1, -1), 'TOP'),
     ]))
-    
+
     return table
